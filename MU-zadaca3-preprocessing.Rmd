@@ -1,0 +1,381 @@
+---
+title: "MU-zadaca3-preprocessing"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+dataset <- read.csv("AppleStore.csv",
+                    fileEncoding = 'UTF-8',
+                    strip.white = TRUE,
+                    header = TRUE,
+                    sep = ',')
+
+```
+
+#Uklanjanje atributa id i currency
+```{r}
+
+podaci <-subset(dataset, select = -c(id, currency, X) )
+
+
+```
+
+```{r}
+
+dim(dataset)
+sapply(dataset, class)
+
+summary(dataset)
+
+
+```
+
+
+
+```{r}
+
+cat("Broj NA vrijednosti u koloni X: ", length(subset(dataset,
+is.na(X))), "\n")
+
+cat("Broj NA vrijednosti u koloni Id: ", length(subset(dataset,
+is.na(id))), "\n")
+
+cat("Broj NA vrijednosti u koloni app_name: ", length(subset(dataset,
+is.na(app_name))), "\n")
+
+cat("Broj NA vrijednosti u koloni size_bytes: ", length(subset(dataset,
+is.na(size_bytes))), "\n")
+
+cat("Broj NA vrijednosti u koloni currency: ", length(subset(dataset,
+is.na(currency))), "\n")
+
+cat("Broj NA vrijednosti u koloni price: ", length(subset(dataset,
+is.na(price))), "\n")
+
+cat("Broj NA vrijednosti u koloni all_ratings: ", length(subset(dataset,
+is.na(all_ratings))), "\n")
+
+cat("Broj NA vrijednosti u koloni current_ver__ratings: ", length(subset(dataset,
+is.na(current_ver__ratings))), "\n")
+
+cat("Broj NA vrijednosti u koloni avg_user_rating: ", length(subset(dataset,
+is.na(avg_user_rating))), "\n")
+
+cat("Broj NA vrijednosti u koloni current_user_rating: ", length(subset(dataset,
+is.na(current_user_rating))), "\n")
+
+cat("Broj NA vrijednosti u koloni latest_version: ", length(subset(dataset,
+is.na(latest_version))), "\n")
+
+cat("Broj NA vrijednosti u koloni age_rating: ", length(subset(dataset,
+is.na(age_rating))), "\n")
+
+cat("Broj NA vrijednosti u koloni genre: ", length(subset(dataset,
+is.na(genre))), "\n")
+
+cat("Broj NA vrijednosti u koloni num_devices_sup: ", length(subset(dataset,
+is.na(num_devices_sup))), "\n")
+
+cat("Broj NA vrijednosti u koloni num_languages: ", length(subset(dataset,
+is.na(num_languages))), "\n")
+
+cat("Broj NA vrijednosti u koloni Developer: ", length(subset(dataset,
+is.na(dataset$Developer))), "\n")
+
+cat("Broj NA vrijednosti u koloni num_screenshot: ", length(subset(dataset,
+is.na(num_screenshot))), "\n")
+
+```
+
+```{r}
+#Distribucija numerickih varijabli
+
+summary(dataset[,c('id', 'size_bytes', 'price', 'all_ratings', 'current_ver__ratings', 'avg_user_rating', 'current_user_rating', 'num_devices_sup', 'num_screenshot', 'num_languages')])
+
+```
+
+```{r}
+#IQR
+
+apply(dataset[,c('id', 'size_bytes', 'price', 'all_ratings', 'current_ver__ratings', 'avg_user_rating', 'current_user_rating', 'num_devices_sup', 'num_screenshot', 'num_languages')],2,IQR, na.rm=TRUE)
+
+```
+
+```{r}
+#Rang
+
+apply(dataset[,c('id', 'size_bytes', 'price', 'all_ratings', 'current_ver__ratings', 'avg_user_rating', 'current_user_rating', 'num_devices_sup', 'num_screenshot', 'num_languages')],2,range, na.rm=TRUE)
+
+```
+
+```{r}
+#Moda
+
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+apply(dataset[,c('id', 'size_bytes', 'price', 'all_ratings', 'current_ver__ratings', 'avg_user_rating', 'current_user_rating', 'num_devices_sup', 'num_screenshot', 'num_languages')],2,getmode)
+
+
+```
+
+```{r}
+#Standardna devijacija
+
+apply(dataset[,c('id', 'size_bytes', 'price', 'all_ratings', 'current_ver__ratings', 'avg_user_rating', 'current_user_rating', 'num_devices_sup', 'num_screenshot', 'num_languages')], 2 ,sd, na.rm=TRUE)
+```
+
+```{r}
+#Varijansa
+
+apply(dataset[,c('id', 'size_bytes', 'price', 'all_ratings', 'current_ver__ratings', 'avg_user_rating', 'current_user_rating', 'num_devices_sup', 'num_screenshot', 'num_languages')],2,var, na.rm=TRUE)
+
+```
+
+#Uklanjanje atributa id
+```{r}
+podaci <-subset(dataset, select = -c(id) )
+
+```
+
+
+#Num varijable
+```{r}
+
+library(ggplot2)
+library(tidyverse)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=size_bytes, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+
+```
+
+
+
+
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=price, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=all_ratings, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=current_ver__ratings, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=avg_user_rating, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=current_user_rating, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=num_devices_sup, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=num_screenshot, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+
+```{r}
+library(ggplot2)
+
+df_tidy <- podaci %>%
+pivot_longer(cols=num_languages, values_to = "obs",
+names_to = "grp")
+plot <- ggplot(df_tidy, aes(x = grp, y = obs, fill = grp))
+plot + geom_boxplot(outlier.colour = "blue", outlier.shape = 1) + coord_flip()
+```
+
+```{r}
+plot(podaci$size_bytes, podaci$current_user_rating)
+
+median <- median(podaci$size_bytes)
+  for (i in 1 : 3) {
+    index_minimuma <- which.min(podaci$size_bytes)
+    podaci$size_bytes[index_minimuma] <- median }
+    index_maximuma <- which.max(podaci$size_bytes)
+    podaci$size_bytes[index_maximuma] <- median
+    
+plot(podaci$size_bytes, podaci$current_user_rating)
+```
+
+```{r}
+plot(podaci$current_ver__ratings, podaci$current_user_rating)
+
+median <- median(podaci$current_ver__ratings)
+for (i in 1 : 10)
+{
+ index_maximuma <- which.max(podaci$current_ver__ratings)
+ podaci$current_ver__ratings[index_maximuma] <- median
+}
+plot(podaci$current_ver__ratings, podaci$current_ver__ratings)
+
+```
+
+```{r}
+plot(podaci$avg_user_rating, podaci$current_user_rating)
+median <- median(podaci$avg_user_rating)
+
+for (i in 1 : 3)
+{
+ index_minimuma <- which.min(podaci$avg_user_rating)
+ podaci$avg_user_rating[index_minimuma] <- median
+ index_maximuma <- which.max(podaci$avg_user_rating)
+ podaci$avg_user_rating[index_maximuma] <- median
+}
+
+plot(podaci$avg_user_rating, podaci$current_user_rating)
+boxplot(podaci$avg_user_rating)
+```
+
+```{r}
+plot(podaci$num_screenshot, podaci$current_user_rating)
+
+median <- median(podaci$num_screenshot)
+for (i in 1 : 3)
+{
+ index_maximuma <- which.max(podaci$num_screenshot)
+ podaci$num_screenshot[index_maximuma] <- median
+}
+
+for (i in 1 : 10)
+{
+ index_minimuma <- which.min(podaci$num_screenshot)
+ podaci$num_screenshot[index_minimuma] <- median
+}
+
+plot(podaci$num_screenshot, podaci$current_user_rating)
+
+boxplot(podaci$num_screenshot)
+```
+```{r}
+
+max <- max(podaci$size_bytes) 
+j <- 0
+while (10 ** j < max)
+j=j+1
+podaci <- mutate(podaci, size_bytes_decscale = size_bytes / 10 ** j)
+
+plot(podaci$current_user_rating, podaci$size_bytes_decscale, main = "Decimal scale normalizacija", bg = "red", pch = 21)
+
+
+```
+
+```{r}
+library(dplyr)
+max <- max(podaci$size_bytes)
+min <- min(podaci$size_bytes)
+podaci <- mutate(podaci, size_bytes_minmax = (size_bytes - min) / (max - min))
+
+plot(podaci$current_user_rating, podaci$toefl_minmax, main = "Min-max normalizacija", bg = "yellow", pch = 21)
+
+```
+
+```{r}
+
+avg <- median(podaci$size_bytes) 
+std <- sd(podaci$size_bytes)
+podaci <- mutate(podaci, toefl_zscore = (size_bytes - avg) / std)
+
+plot(podaci$current_user_rating, podaci$size_bytes_zscore, main = "Z-score normalizacija", bg = "green", pch = 21)
+
+```
+
+```{r}
+
+library(dplyr)
+max <- max(podaci$size_bytes)
+min <- min(podaci$size_bytes)
+podaci <- mutate(podaci, minmax_size_bytes = (size_bytes - min) / (max -
+min))
+
+plot(podaci$current_user_rating, podaci$minmax_size_bytes, main = "Min-max normalizacija", bg = "yellow", pch = 21)
+```
+
+```{r}
+
+avg <- median(podaci$size_bytes) 
+std <- sd(podaci$size_bytes)
+podaci <- mutate(podaci, toefl_zscore = (size_bytes - avg) / std)
+
+plot(podaci$current_user_rating, podaci$size_bytes_zscore, main = "Z-score normalizacija", bg = "green", pch = 21)
+
+```
+
+#decimalna normalizacija za atribut size_bytes
+```{r}
+
+max <- max(podaci$size_bytes) 
+j <- 0
+while (10 ** j < max)
+j=j+1
+podaci <- mutate(podaci, size_bytes_decscale = size_bytes / 10 ** j)
+
+plot(podaci$current_user_rating, podaci$size_bytes_decscale, main = "Decimal scale normalizacija", bg = "red", pch = 21)
+
+
+```
+
+```{r}
+write.csv(podaci, file = "podaci.csv")
+```
+
+
+
+
+
+```

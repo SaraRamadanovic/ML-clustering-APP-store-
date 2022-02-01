@@ -1,0 +1,193 @@
+---
+title: "MU-zadaca3-PAM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+
+library(stats)
+podaci <- read.csv("podaci.csv", fileEncoding = 'UTF-8')
+podaci <-subset(podaci, select = -c(numbers) )
+
+podaci$app_name <- as.numeric(factor(podaci$app_name))
+
+podaci$latest_version <- as.numeric(factor(podaci$latest_version)) 
+
+podaci$age_rating <- as.numeric(factor(podaci$age_rating)) 
+
+podaci$genre <- as.numeric(factor(podaci$genre))
+
+```
+
+```{r}
+
+pca <- prcomp((podaci), scale. = TRUE)
+
+library(factoextra) 
+fviz_eig(pca) 
+summary(pca)
+
+```
+
+```{r}
+
+fviz_pca_var(pca,
+col.var = "contrib",
+gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE
+)
+
+
+```
+```{r}
+
+ newdata <- predict(pca, podaci) 
+ newdata <- newdata[, 1:10] 
+ newdata <- data.frame(newdata)
+
+```
+
+#clustering nad izvornim podacima
+```{r}
+
+model <- pam(podaci, centers = 2)
+plot(podaci[c("avg_user_rating", "current_user_rating")], col = model$cluster) 
+plot(podaci[c("age_rating", "genre")], col = model$cluster)
+
+fviz_cluster(model, data = podaci)
+```
+
+
+#PAM
+```{r}
+
+library(cluster)
+
+model <- pam(newdata, k = 2)
+plot(newdata[c("PC1", "PC2")], col = model$cluster) 
+plot(newdata[c("PC2", "PC4")], col = model$cluster)
+fviz_cluster(model, data = newdata)
+
+```
+
+#Odredjivanje optimalnog broja klastera
+
+#Elbow
+```{r}
+fviz_nbclust(newdata, pam, method = "wss")
+
+```
+
+#Silhouette metoda
+```{r}
+
+fviz_nbclust(newdata, pam, method = "silhouette")
+
+```
+
+
+
+#Gap metoda
+```{r}
+
+fviz_nbclust(newdata, pam, method = "gap_stat", nboot = 2)
+
+```
+
+#Hopkins
+```{r}
+
+library(hopkins)
+hopkins1 <- hopkins(podaci, n = 10)
+hopkins2 <- hopkins(newdata, n = 10)
+cat("Hopkins statistika za originalne podatke:", hopkins1$H, "\n") 
+cat("Hopkins statistika za PCA podatke:", hopkins2$H)
+
+```
+
+
+#metrike distance
+```{r}
+library(factoextra)
+
+distance <- get_dist(podaci, method = "manhattan")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+distance <- get_dist(podaci, method = "euclidean")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+distance <- get_dist(podaci, method = "minkowski")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+distance <- get_dist(podaci, method = "pearson")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+
+
+
+```
+
+#promjene metrika distanci za PAM
+
+```{r}
+
+
+
+```
+
+```{r}
+
+
+model <- pam(newdata, 2, metric = "manhattan")
+sil <- silhouette(model$cluster, get_dist(newdata, method = "manhattan"))
+cat("Srednja vrijednost silhouette metrike za PAM (manhattan metrika):", mean(sil[, 3]), "\n")
+fviz_silhouette(model)
+
+```
+#K-means
+
+
+```{r}
+
+model <- kmeans(newdata, centers = 2)
+plot(newdata[c("PC1", "PC2")], col = model$cluster) 
+plot(newdata[c("PC2", "PC4")], col = model$cluster)
+fviz_cluster(model, data = newdata)
+
+
+```
+
+```{r}
+
+fviz_nbclust(newdata, kmeans, method = "wss")
+fviz_nbclust(newdata, kmeans, method = "silhouette")
+fviz_nbclust(newdata, kmeans, method = "gap_stat", nboot = 2)
+
+```
+
+#metrike distance
+```{r}
+library(factoextra)
+
+distance <- get_dist(podaci, method = "manhattan")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+distance <- get_dist(podaci, method = "euclidean")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+distance <- get_dist(podaci, method = "minkowski")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+distance <- get_dist(podaci, method = "pearson")
+fviz_dist(distance, gradient = list(low = "blue", mid = "white", high = "red"))
+
+
+```
+
+```{r}
+
+
+model <- kmeans(newdata, 2, metric = "manhattan")
+sil <- silhouette(model$cluster, get_dist(newdata, method = "manhattan"))
+cat("Srednja vrijednost silhouette metrike za PAM (manhattan metrika):", mean(sil[, 3]), "\n")
+fviz_silhouette(model)
+
+```
